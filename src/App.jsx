@@ -1,45 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Card, Container, Row, Col, Form } from "react-bootstrap";
+import { API_URL } from "../constants.json";
 
 function InventoryManagement() {
-  const [inventory, setInventory] = useState([
-    { id: 1, name: "Lemon Tea", quantity: 5, price: 5.5 },
-    { id: 2, name: "Apple Juice ", quantity: 10, price: 6 },
-    { id: 3, name: "Milk ", quantity: 15, price: 10 },
-    { id: 4, name: "Coke ", quantity: 20, price: 7 },
-  ]);
+  const [inventory, setInventory] = useState([]);
   const [priceInput, setPriceInput] = useState({});
-  const incrementQuantity = (id) => {
-    setInventory(
-      inventory.map((item) =>
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
-  };
 
-  const decrementQuantity = (id) => {
-    setInventory(
-      inventory.map((item) =>
-        item.id === id && item.quantity > 0
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
-  };
+  useEffect(() => {
+    fetch(`${API_URL}/getELabels/`)
+      .then((response) => response.json())
+      .then((data) => setInventory(data))
+      .catch((error) => console.error("Error:", error));
+  }, []);
 
-  const changePrice = (id, newPrice) => {
-    setInventory(
-      inventory.map((item) =>
-        item.id === id ? { ...item, price: newPrice } : item
-      )
-    );
+  const changePrice = (name, newPrice) => {
+    fetch(`${API_URL}/putELabel/${name}/price/${newPrice}`, {
+      method: "PUT",
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Data:", data);
+        setInventory(
+          inventory.map((item) =>
+            item.name === name ? { ...item, price: newPrice } : item
+          )
+        );
+        alert("Change Success");
+      })
+      .catch((error) => console.error("Error:", error));
   };
   return (
     <Container>
       <h1 className="text-center my-3">Inventory Management</h1>
       <Row>
-        {inventory.map((item) => (
-          <Col sm={6} md={4} lg={3} key={item.id}>
+        {inventory.map((item, index) => (
+          <Col sm={6} md={4} lg={3} key={index}>
             <Card className="mb-3">
               <Card.Body>
                 <Card.Title>{item.name}</Card.Title>
@@ -49,17 +44,14 @@ function InventoryManagement() {
                   <Form.Label>Change Price</Form.Label>
                   <Form.Control
                     type="number"
-                    value={priceInput[item.id] || item.price}
+                    defaultValue={item.price}
                     onChange={(e) =>
-                      setPriceInput({
-                        ...priceInput,
-                        [item.id]: Number(e.target.value),
-                      })
+                      setPriceInput({ name: item.name, price: e.target.value })
                     }
                   />
                   <Button
                     variant="success"
-                    onClick={() => changePrice(item.id)}
+                    onClick={() => changePrice(item.name, priceInput.price)}
                   >
                     Change Price
                   </Button>
