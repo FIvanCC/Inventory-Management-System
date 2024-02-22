@@ -59,7 +59,7 @@ db.once('open', function () {
             });
     });
 
-    //update an elabel
+    //update an elabel price by name
     app.put('/putELabel/:name/price/:price', (req, res) => {
         const name = req.params.name;
         const newPrice = req.params.price;
@@ -78,6 +78,26 @@ db.once('open', function () {
                 res.status(500).send(error);
             });
     });
+    //update an elabel quantity by name
+    app.put('/putELabel/:name/quantity/:quantity', (req, res) => {
+        const name = req.params.name;
+        const newQuantity = req.params.quantity;
+
+        ELabel.findOneAndUpdate({ name: name }, { quantity: newQuantity }, { new: true, useFindAndModify: false })
+            .then((data) => {
+                if (data) {
+                    console.log('Data:', data);
+                    res.status(200).send(data);
+                } else {
+                    res.status(404).send({ message: 'ELabel not found' });
+                }
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                res.status(500).send(error);
+            });
+    });
+
 
     app.all('/*', (req, res) => {
         res.send('Hello World!');
