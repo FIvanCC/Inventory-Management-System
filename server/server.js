@@ -34,7 +34,6 @@ db.once('open', function () {
     //         console.error('Error saving document:', err);
     //     });
 
-    // const imagePath = path.join('C:/Users/ccfgu/Desktop/For_all_the_shit', '2.png');
 
     // const newImage = new Image({
     //     name: 'My Image',
@@ -52,7 +51,7 @@ db.once('open', function () {
     //         console.error('Error saving image:', err);
     //     });
     //get all the elabels
-    app.get('/getELabels/', (req, res) => {
+    app.get('/Elabels', (req, res) => {
         ELabel.find({}, "-_id -__v")
             .then((data) => {
                 console.log('Data:', data);
@@ -64,7 +63,7 @@ db.once('open', function () {
             });
     });
     //find an elabel by name
-    app.get('/getELabel/:name', (req, res) => {
+    app.get('/Elabel/:name', (req, res) => {
         const name = req.params.name;
 
         ELabel.findOne({ name: name }, "-_id -__v")
@@ -83,7 +82,7 @@ db.once('open', function () {
     });
 
     //update an elabel price by name
-    app.put('/putELabel/:name/price/:price', (req, res) => {
+    app.put('/ELabel/:name/price/:price', (req, res) => {
         const name = req.params.name;
         const newPrice = req.params.price;
 
@@ -102,7 +101,7 @@ db.once('open', function () {
             });
     });
     //update an elabel quantity by name
-    app.put('/putELabel/:name/quantity/:quantity', (req, res) => {
+    app.put('/ELabel/:name/quantity/:quantity', (req, res) => {
         const name = req.params.name;
         const newQuantity = req.params.quantity;
 
@@ -119,24 +118,6 @@ db.once('open', function () {
                 console.error('Error:', error);
                 res.status(500).send(error);
             });
-    });
-
-    app.post('/cam/upload', (req, res) => {
-        let chunks = [];
-        req.on('data', chunk => chunks.push(chunk));
-        req.on('end', () => {
-            const img = Buffer.concat(chunks).toString('base64');
-            const newImageData = { file: img };
-            Image.findOneAndReplace({}, newImageData, { upsert: true })
-                .then(() => {
-                    console.log("Image inserted");
-                    res.sendStatus(200);
-                })
-                .catch(err => {
-                    console.error(err);
-                    res.status(500).send(err);
-                });
-        });
     });
     // Add the new endpoints for image handling
     app.post('/cam/upload', upload.single('image'), (req, res) => {

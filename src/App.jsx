@@ -7,14 +7,14 @@ function InventoryManagement() {
   const [priceInput, setPriceInput] = useState({});
 
   useEffect(() => {
-    fetch(`${API_URL}/getELabels/`)
+    fetch(`${API_URL}/ELabels/`, { method: "GET" })
       .then((response) => response.json())
       .then((data) => setInventory(data))
       .catch((error) => console.error("Error:", error));
   }, []);
 
   const changePrice = (name, newPrice) => {
-    fetch(`${API_URL}/putELabel/${name}/price/${newPrice}`, {
+    fetch(`${API_URL}/ELabel/${name}/price/${newPrice}`, {
       method: "PUT",
     })
       .then((response) => response.json())
